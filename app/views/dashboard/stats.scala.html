@@ -1,0 +1,494 @@
+@(user: User)
+
+@main(user) {
+<script>
+        function updateUserTable(){
+            $('#userTable tbody > tr').remove();
+            $.getJSON( "/stats/listUsers", function( data ) {
+                var totAnnotations = 0;
+                var totGarbaged = 0;
+                var totClazz = {};
+                $.each(data, function(i, user) {
+                    var row = "";
+                    for(clazz in user.termNClass){
+                      if(totClazz[clazz])
+                        totClazz[clazz]=totClazz[clazz]+user.termNClass[clazz];
+                      else
+                        totClazz[clazz] = user.termNClass[clazz];
+                      var ratio = Math.round((user.termNClass[clazz]/user.annotations)*100)
+                      row = row + "<td>"+user.termNClass[clazz]+" ("+ ratio +"%)</td>";
+                    }
+                    totAnnotations = totAnnotations + user.annotations;
+                    totGarbaged = totGarbaged + user.garbagedWords;
+                    $('#userTable > tbody:last').append('<tr><td>'+user.username.substring(0,8)+'</td><td>'+user.annotations+'</td><td>'+user.garbagedWords+'</td>'+row+'</tr>');
+                });
+                var totRow = "";
+                for(clazz in totClazz){
+                   var ratio = Math.round((totClazz[clazz]/totAnnotations)*100)
+                   totRow = totRow + "<td>"+totClazz[clazz]+" ("+ ratio +"%)</td>";
+                }
+                $('#userTable > tbody:last').append('<tr class="active"><td>TOT</td><td>'+totAnnotations+'</td><td>'+totGarbaged+'</td>'+totRow+'</tr>');
+            });
+        }
+
+        function updateGarbageAgreementTable(){
+            $('#garbageAgreementTable tbody > tr').remove();
+            $.getJSON("/stats/userAgreementOnGarbagedWords", function( data ) {
+                $.each(data, function(i, item) {
+                    var agr = (item.inter/item.union?Math.round((item.inter/item.union)*10000)/100 + "%":"-");
+                    $('#garbageAgreementTable > tbody:last').append('<tr><td>'+item.username1.substring(0,8)+'</td><td>'+item.username2.substring(0,8)+'</td><td>'+item.inter+'</td><td>'+item.union+'</td><td>'+ agr +'</td></tr>');
+                });
+            });
+        }
+
+        function getUserPairs (callback) {
+            $.getJSON( "/stats/userPairs", function( data ) {
+                callback(data);
+            });
+        }
+
+        function getUserAgreements(clazz) { getUserPairs( function(userPairs) {
+            $('#'+clazz.toLowerCase()+'AgreementTable tbody > tr').remove();
+           function getUserAgreement(userPair) {
+                if(userPair<=userPairs){
+                    $.getJSON( "/stats/userAgreementOn/"+clazz+"/"+userPair, function( item ) {
+                        var agr = (item.inter/item.union?Math.round((item.inter/item.union)*10000)/100 + "%":"-");
+                        $('#'+clazz.toLowerCase()+'AgreementTable > tbody:last').append('<tr><td>'+item.username1.substring(0,8)+'</td><td>'+item.username2.substring(0,8)+'</td><td>'+item.inter+'</td><td>'+item.union+'</td><td>'+ agr +'</td></tr>');
+                        getUserAgreement(userPair+1);
+                    });
+                }
+            }
+            getUserAgreement(1);
+        })}
+
+        function challengeAgreementTable(){
+            getUserAgreements("Challenge");
+        }
+
+        function collectionAgreementTable(){
+            getUserAgreements("Collection");
+        }
+
+        function garbageAgreementTable(){
+            getUserAgreements("Garbage");
+        }
+
+        function measureAgreementTable(){
+            getUserAgreements("Measure");
+        }
+
+        function noneAgreementTable(){
+            getUserAgreements("None");
+        }
+
+        function runAgreementTable(){
+            getUserAgreements("Run");
+        }
+
+        function taskAgreementTable(){
+            getUserAgreements("Task");
+        }
+
+        function testcollectionAgreementTable(){
+            getUserAgreements("TestCollection");
+        }
+
+        function challengeTaskAgreementTable(){
+            getUserAgreements("ChallengeTask");
+        }
+
+        function collectionTestCollectionAgreementTable(){
+            getUserAgreements("CollectionTestCollection");
+        }
+
+        function updateGarbagedWordsTable(){
+            $('#updateGarbagedWordsTable tbody > tr').remove();
+            $.getJSON( "/stats/usersGarbagedWords", function( data ) {
+                $.each(data, function(i, item) {
+                    $('#updateGarbagedWordsTable > tbody:last').append('<tr><td>'+item.username.substring(0,8)+'</td><td>'+item.size+'</td><td>'+item.words+'</td></tr>');
+                });
+            });
+        }
+
+        function updateGarbagedWordsPairwiseTable(){
+            $('#updateGarbagedWordsPairwiseTable tbody > tr').remove();
+            $.getJSON( "/stats/pairwiseUsersGarbagedWords", function( data ) {
+                $.each(data, function(i, item) {
+                    $('#updateGarbagedWordsPairwiseTable > tbody:last').append('<tr><td>'+item.username1.substring(0,8)+'</td><td>'+item.username2.substring(0,8)+'</td><td>'+item.size+'</td><td>'+item.words+'</td></tr>');
+                });
+            });
+        }
+
+        function updateNumberWordsPerClassTable(){
+            $('#numberWordsPerClassTable tbody > tr').remove();
+            $.getJSON( "/stats/numberTermsPerClass", function( data ) {
+                $.each(data, function(i, item) {
+                    $('#numberWordsPerClassTable > tbody:last').append('<tr><td>'+item.name+'</td><td>'+item.n+'</td></tr>');
+                });
+            });
+        }
+
+    </script>
+
+<div class="row">
+    <div class="col-md-12">
+        <!-- User table -->
+        <div class="panel panel-default">
+            <div class="panel-heading clearfix">
+                <h4 class="panel-title pull-left"  style="padding-top: 7.5px;">User list with details</h4>
+                <div class="btn-group pull-right">
+                    <a onClick="updateUserTable()" class="btn btn-default btn-sm">Update</a>
+                </div>
+            </div>
+            <table id="userTable" class="table">
+                <thead><tr><th>Username</th><th>TOT</th><th>Garbaged Words</th><th>Collection</th><th>Run</th><th>Garbage</th><th>Challenge</th><th>TestCollection</th><th>None</th><th>Task</th><th>Measure</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <!-- Number of words generated in each class table -->
+        <div class="panel panel-default">
+            <div class="panel-heading clearfix">
+                <h4 class="panel-title pull-left"  style="padding-top: 7.5px;">Number of words generated for each class (No G.)</h4>
+                <div class="btn-group pull-right">
+                    <a onClick="updateNumberWordsPerClassTable()" class="btn btn-default btn-sm">Update</a>
+                </div>
+            </div>
+            <table id="numberWordsPerClassTable" class="table">
+                <thead><tr><th>Name</th><th>n</th></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <!-- Garbage agreement table -->
+        <div class="panel panel-default">
+            <div class="panel-heading clearfix">
+                <h4 class="panel-title pull-left"  style="padding-top: 7.5px;">User agr. on garbaged words</h4>
+                <div class="btn-group pull-right">
+                    <a onClick="updateGarbageAgreementTable()" class="btn btn-default btn-sm">Update</a>
+                </div>
+            </div>
+            <table id="garbageAgreementTable" class="table">
+                <thead><tr><th>User1</th><th>User2</th><th>Inter.</th><th>Union</th><th>Inter./Union</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <!-- Challenge agreement -->
+        <div class="panel panel-default">
+            <div class="panel-heading clearfix">
+                <h4 class="panel-title pull-left"  style="padding-top: 7.5px;">User agr. on Challenge class</h4>
+                <div class="btn-group pull-right">
+                    <a onClick="challengeAgreementTable()" class="btn btn-default btn-sm">Update</a>
+                </div>
+            </div>
+            <table id="challengeAgreementTable" class="table">
+                <thead><tr><th>User1</th><th>User2</th><th>Inter.</th><th>Union</th><th>Inter./Union</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <!-- Collection agreement -->
+        <div class="panel panel-default">
+            <div class="panel-heading clearfix">
+                <h4 class="panel-title pull-left"  style="padding-top: 7.5px;">User agr. on Collection class</h4>
+                <div class="btn-group pull-right">
+                    <a onClick="collectionAgreementTable()" class="btn btn-default btn-sm">Update</a>
+                </div>
+            </div>
+            <table id="collectionAgreementTable" class="table">
+                <thead><tr><th>User1</th><th>User2</th><th>Inter.</th><th>Union</th><th>Inter./Union</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <!-- Measure agreement -->
+        <div class="panel panel-default">
+            <div class="panel-heading clearfix">
+                <h4 class="panel-title pull-left"  style="padding-top: 7.5px;">User agr. on Measure class</h4>
+                <div class="btn-group pull-right">
+                    <a onClick="measureAgreementTable()" class="btn btn-default btn-sm">Update</a>
+                </div>
+            </div>
+            <table id="measureAgreementTable" class="table">
+                <thead><tr><th>User1</th><th>User2</th><th>Inter.</th><th>Union</th><th>Inter./Union</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <!-- None agreement -->
+        <div class="panel panel-default">
+            <div class="panel-heading clearfix">
+                <h4 class="panel-title pull-left"  style="padding-top: 7.5px;">User agr. on None class (*)</h4>
+                <div class="btn-group pull-right">
+                    <a onClick="noneAgreementTable()" class="btn btn-default btn-sm">Update</a>
+                </div>
+            </div>
+            <table id="noneAgreementTable" class="table">
+                <thead><tr><th>User1</th><th>User2</th><th>Inter.</th><th>Union</th><th>Inter./Union</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <!-- Run agreement -->
+        <div class="panel panel-default">
+            <div class="panel-heading clearfix">
+                <h4 class="panel-title pull-left"  style="padding-top: 7.5px;">User agr. on Run class</h4>
+                <div class="btn-group pull-right">
+                    <a onClick="runAgreementTable()" class="btn btn-default btn-sm">Update</a>
+                </div>
+            </div>
+            <table id="runAgreementTable" class="table">
+                <thead><tr><th>User1</th><th>User2</th><th>Inter.</th><th>Union</th><th>Inter./Union</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <!-- Task agreement -->
+        <div class="panel panel-default">
+            <div class="panel-heading clearfix">
+                <h4 class="panel-title pull-left"  style="padding-top: 7.5px;">User agr. on Task class</h4>
+                <div class="btn-group pull-right">
+                    <a onClick="taskAgreementTable()" class="btn btn-default btn-sm">Update</a>
+                </div>
+            </div>
+            <table id="taskAgreementTable" class="table">
+                <thead><tr><th>User1</th><th>User2</th><th>Inter.</th><th>Union</th><th>Inter./Union</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <!-- TestCollection agreement -->
+        <div class="panel panel-default">
+            <div class="panel-heading clearfix">
+                <h4 class="panel-title pull-left"  style="padding-top: 7.5px;">User agr. on TestCollection class</h4>
+                <div class="btn-group pull-right">
+                    <a onClick="testcollectionAgreementTable()" class="btn btn-default btn-sm">Update</a>
+                </div>
+            </div>
+            <table id="testcollectionAgreementTable" class="table">
+                <thead><tr><th>User1</th><th>User2</th><th>Inter.</th><th>Union</th><th>Inter./Union</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <!-- Task Challenge agreement -->
+        <div class="panel panel-default">
+            <div class="panel-heading clearfix">
+                <h4 class="panel-title pull-left"  style="padding-top: 7.5px;">User agr. on Challenge/Task class</h4>
+                <div class="btn-group pull-right">
+                    <a onClick="challengeTaskAgreementTable()" class="btn btn-default btn-sm">Update</a>
+                </div>
+            </div>
+            <table id="challengetaskAgreementTable" class="table">
+                <thead><tr><th>User1</th><th>User2</th><th>Inter.</th><th>Union</th><th>Inter./Union</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <!-- TestCollection Collection agreement -->
+        <div class="panel panel-default">
+            <div class="panel-heading clearfix">
+                <h4 class="panel-title pull-left"  style="padding-top: 7.5px;">User agr. on TestCollection class</h4>
+                <div class="btn-group pull-right">
+                    <a onClick="collectionTestCollectionAgreementTable()" class="btn btn-default btn-sm">Update</a>
+                </div>
+            </div>
+            <table id="collectiontestcollectionAgreementTable" class="table">
+                <thead><tr><th>User1</th><th>User2</th><th>Inter.</th><th>Union</th><th>Inter./Union</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <!-- Garbaged words -->
+        <div class="panel panel-default">
+            <div class="panel-heading clearfix">
+                <h4 class="panel-title pull-left" style="padding-top: 7.5px;">List of garbaged words per each user</h4>
+                <div class="btn-group pull-right">
+                    <a onClick="updateGarbagedWordsTable()" class="btn btn-default btn-sm">Update</a>
+                </div>
+            </div>
+            <table id="updateGarbagedWordsTable" class="table">
+                <thead><tr><th>Username</th><th>N</th><th>Garbaged Words</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <!-- User table -->
+        <div class="panel panel-default">
+            <div class="panel-heading clearfix">
+                <h4 class="panel-title pull-left"  style="padding-top: 7.5px;">List of garbaged words per pair of users</h4>
+                <div class="btn-group pull-right">
+                    <a onClick="updateGarbagedWordsPairwiseTable()" class="btn btn-default btn-sm">Update</a>
+                </div>
+            </div>
+            <table id="updateGarbagedWordsPairwiseTable" class="table">
+                <thead><tr><th>User1</th><th>User2</th><th>N</th><th>Garbaged Words</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<!-- Annotation Skiped -->
+
+
+<!-- Plots -->
+<style>
+
+    .axis path,
+
+    .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+    }
+
+    .x.axis path {
+    display: none;
+    }
+
+    .line {
+    fill: none;
+    stroke: steelblue;
+    stroke-width: 1.5px;
+    }
+
+</style>
+<script src="http://d3js.org/d3.v3.js"></script>
+<script>
+        var riNewWordsFunctionInitialized = false;
+        var cdata = [];
+        var riNewWordsFunctionSize, riNewWordsFunctionIter = 0;
+        function updateRiNewWordsFunction() {
+            $('#riNewWordsFunction').empty();
+
+            var margin = {top: 20, right: 20, bottom: 30, left: 50},
+                width = 960 - margin.left - margin.right,
+                height = 500 - margin.top - margin.bottom;
+
+            var x = d3.scale.linear()
+                .range([0, width]);
+
+            var y = d3.scale.linear()
+                .range([height, 0]);
+
+            var xAxis = d3.svg.axis()
+                .scale(x)
+                .orient("bottom");
+
+            var yAxis = d3.svg.axis()
+                .scale(y)
+                .orient("left");
+
+            var line = d3.svg.line()
+                .x(function(d) { return x(d.x); })
+                .y(function(d) { return y(d.y); });
+
+            svg = d3.select("#riNewWordsFunction").append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height",height + margin.top + margin.bottom)
+                   .append("g")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            svg.append("g")
+               .attr("class", "x axis")
+               .attr("transform", "translate(0," + height + ")")
+               .call(xAxis);
+
+            svg.append("g")
+               .attr("class", "y axis")
+               .call(yAxis)
+              .append("text")
+               .attr("transform", "rotate(-90)")
+               .attr("y", 6)
+               .attr("dy", ".71em")
+               .style("text-anchor", "end")
+               .text("N");
+
+            $.getJSON("/stats/riNewWordsFunctionSize", function(size) {
+                riNewWordsFunctionSize = size;
+
+                  function redrawGraphRecursivly(i) {
+                    if(i<riNewWordsFunctionSize){
+                        $.getJSON("/stats/riNewWordsFunction/"+i, function(data) {
+                          x.domain(d3.extent(cdata, function(d) { return d.x; }));
+                          y.domain([0, d3.max(cdata, function(d) { return d.y; })]);
+
+                           svg.selectAll("g .y.axis")
+                            .call(yAxis);
+
+                           svg.selectAll("g .x.axis")
+                            .call(xAxis);
+
+                          if(i!=0){
+                              cdata.push({x:data.x,
+                                          y:(data.y+cdata[cdata.length-1].y)});
+                              svg.selectAll("path")
+                                .datum(cdata)
+                                .attr("class", "line")
+                                .attr("d", line);
+                          }else{
+                              cdata.push(data);
+                              svg.append("path")
+                                .datum(cdata)
+                                .attr("class", "line")
+                                .attr("d", line);
+                          }
+                          redrawGraphRecursivly(i+1);
+                        });
+                    }
+                  }
+                  redrawGraphRecursivly(0);
+
+            });
+
+        }
+    </script>
+
+
+<div class="row">
+    <div class="col-md-12">
+        <!-- User table -->
+        <div class="panel panel-default">
+            <div class="panel-heading clearfix">
+                <h4 class="panel-title pull-left"  style="padding-top: 7.5px;">RI New Words Function (Increase delay)</h4>
+                <div class="btn-group pull-right">
+                    <a onClick="updateRiNewWordsFunction()" class="btn btn-default btn-sm">Update</a>
+                </div>
+            </div>
+            <div id="riNewWordsFunction"></div>
+        </div>
+    </div>
+</div>
+
+
+}

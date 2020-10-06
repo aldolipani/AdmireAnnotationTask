@@ -1,0 +1,23 @@
+@(signupForm: Form[(String, String)],loginForm: Form[(String, String)])(message:String = "")
+
+@scripts = {
+    <script src="@routes.Assets.at("javascripts/password.js")" type="text/javascript"></script>
+}
+
+@main(null, scripts) {
+
+  <h5>@message</h5>
+  <div class="col-lg-6">
+      @description()
+  </div>
+
+  <div class="col-lg-6">
+    <div class="well">
+      @login(loginForm)
+    </div>
+
+    <div class="well">
+      @register(signupForm)
+    </div>
+  </div>
+}

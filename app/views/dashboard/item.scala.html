@@ -1,0 +1,22 @@
+@(seed: Seed, embryon:Embryon, category: Category, n: Int, disabled: Boolean)
+<div class="buttonSpacer">
+    <form style="display:inline;" action=@routes.Dashboard.annotate(seed.id,embryon.idEmbryon,category.id) method="get">
+        @if(disabled){
+            <div class="box">
+                @if(category.id!="Skip") {
+                    <div class="badge overlay top-rigth white">@n</div>
+                }
+                <button class="pad" type="submit" disabled>@category.id</button>
+            </div>
+        }else{
+            <div class="box">
+                @if(category.id!="Skip") {
+                    <div class="badge overlay top-rigth white">@n</div>
+                }
+                <button class="pad" type="submit">@category.id</button>
+            </div>
+        }
+    </form>
+</div>
+
+

@@ -1,0 +1,86 @@
+.buttonSpacer{
+  width:120px;
+  height:120px;
+  display:inline-block;
+}
+
+button.pad{
+  width:100px;
+  height:100px;
+  display:inline-block;
+  color:#fff;
+  text-decoration:none;
+  text-align:center;
+  text-shadow:1px 1px 0px #07526e;
+  padding-top:6px;
+  margin-left:auto;
+  margin-right:auto;
+  left:0px;
+  position:absolute;
+  cursor:pointer;
+  border: none;
+  background: #109bce;
+  background-image: linear-gradient(bottom, rgb(14,137,182) 0%, rgb(22,179,236) 100%);
+  border-radius: 5px;
+  box-shadow: inset 0px 1px 0px #2ab7ec, 0px 5px 0px 0px #07526e, 0px 10px 5px #999;
+}
+
+.box {
+  width:100px;
+  height:100px;
+  position:relative;
+}
+
+.overlay {
+    z-index:100;
+}
+
+.white {
+    background-color: #fff;
+    color: #428bca;
+}
+
+.top-rigth {
+    position:absolute;
+    right:5px;
+    top:7px;
+}
+
+button:active.pad{
+  top:3px;
+  box-shadow: inset 0px 1px 0px #2ab7ec, 0px 2px 0px 0px #07526e, 0px 5px 3px #999;
+}
+
+button:disabled.pad{
+  top: 3px;
+  background: #aaaaaa;
+  box-shadow: inset 0px 1px 0px #ececec, 0px 2px 0px 0px #6e6e6e, 0px 5px 3px #999;
+}
+
+button:before.pad{
+  font-family: 'socialfont';
+  font-size: 50px;
+  line-height: 1em;
+  font-weight: normal;
+  color: #fff;
+  width:85px;
+  height:90px;
+  display:block;
+  position:absolute;
+  padding-top:10px;
+  top:10px;
+  text-shadow: 1px 1px 2px #07526e;
+}
+
+button:active:before.pad{
+  top: 7px;
+  font-size: 50px;
+  text-shadow: 0px 3px 0px #07526e, 0px 5px 1px #07526e/*, 3px 0px 1px #07526e, 3px 3px 1px #07526e,
+     -2px 0px 1px #68cff2*/;
+}
+
+button:disabled:before.pad{
+  top: 3px;
+  font-size: 50px;
+  box-shadow: inset 0px 1px 0px #ececec, 0px 2px 0px 0px #6e6e6e, 0px 5px 3px #999;
+}

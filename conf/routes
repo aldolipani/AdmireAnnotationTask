@@ -1,0 +1,39 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET         /                                                       controllers.Application.index
+GET         /dashboard                                              controllers.Dashboard.index
+GET         /dashboard/stats                                        controllers.Dashboard.stats
+GET         /dashboard/forceEmbryonsGeneration                      controllers.Dashboard.forceEmbryonsGeneration
+GET         /dashboard/forceSeedsGeneration                         controllers.Dashboard.forceSeedsGeneration
+GET         /dashboard/refillAnnotationsPools                       controllers.Dashboard.refillAnnotationsPools
+GET         /dashboard/:id_embryon                                  controllers.Dashboard.indexEmbryon(id_embryon: Int)
+GET         /dashboard/annotation/:id_term/:id_doc/:id_cat          controllers.Dashboard.annotate(id_term: String, id_doc: String, id_cat: String)
+GET         /dashboard/delete_garbaged_terms/:id_term               controllers.Dashboard.deleteGarbagedTerm(id_term: String)
+
+GET         /stats/listUsers                                        controllers.Stats.listUsers
+GET         /stats/userAgreementOnGarbagedWords                     controllers.Stats.userAgreementOnGarbagedWords
+GET         /stats/usersGarbagedWords                               controllers.Stats.usersGarbagedWords
+GET         /stats/pairwiseUsersGarbagedWords                       controllers.Stats.pairwiseUsersGarbagedWords
+GET         /stats/userPairs                                        controllers.Stats.userPairs
+GET         /stats/userAgreementOn/:id_cat/:id_pair                 controllers.Stats.userAgreementOn(id_cat: String, id_pair: Int)
+GET         /stats/numberTermsPerClass                              controllers.Stats.numberTermsPerClass
+GET         /stats/riNewWordsFunction/:i                            controllers.Stats.riNewWordsFunction(i: Int)
+GET         /stats/riNewWordsFunctionSize                           controllers.Stats.riNewWordsFunctionSize
+
+GET         /exporter/exportAnnotationsAsDocuments                  controllers.Exporter.exportAnnotationsAsDocuments
+GET         /exporter/status/:name                                  controllers.Exporter.status(name: String)
+
+
+POST        /login                                                  controllers.Application.authenticate()
+GET         /logout                                                 controllers.Application.logout()
+GET         /admire_annotation                                      controllers.Application.index
+
+POST        /signup                                                 controllers.account.Signup.save()
+
+# Map static resources from the /public folder to the /assets URL path
+GET         /assets/*file                                           controllers.Assets.at(path="/public", file)
+
+GET         /*url                                                   controllers.Application.pageNotFound(url: String)

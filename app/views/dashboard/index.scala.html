@@ -1,0 +1,56 @@
+@(user: User, seedId: String, embryon: Embryon, doc: controllers.searchEngine.Document, snippet: controllers.searchEngine.Snippet, categories: List[Category], lastGarbagedTerms:List[String], garbagedTerms: List[String], termsClass: Map[String, Set[String]], termsNClass: Map[String, Int])
+
+@markTerm(term: String, seedId: String) = {
+    @term.substring(0,term.indexOf(seedId))<span class="label label-primary">@seedId</span>@term.substring(term.indexOf(seedId)+seedId.length)
+}
+
+@markTrash(term: String) = {
+    <a href=@routes.Dashboard.deleteGarbagedTerm(term)>
+        <span class="label label-danger">@term.trim</span></a>
+}
+
+@markOther(term: String) = {
+    <span class="label label-default">@term.trim</span>
+}
+
+@main(user, seedId=seedId) {
+
+    <div class="row">
+        <div class="col-md-@((12-Math.sqrt(categories.size)-2).toInt)">
+            <div class="panel panel-primary">
+                <div class="panel-heading"><h3 class="panel-title">@seedId</h3></div>
+
+                <ul class="list-group">
+                    <li class="list-group-item"><p>@snippet.pre @snippet.center.split(" ").map(t => {
+                        val nSeedId = if(seedId.size > 1 && seedId.charAt(seedId.size-1) == 'y') seedId.substring(0, seedId.size-1) else seedId
+                        val ray = Dashboard.computeRay(snippet.center.split(" "), nSeedId)
+                        if(t.contains(nSeedId) && Math.abs(t.size - nSeedId.size) <= ray) markTerm(t, nSeedId)
+                        else if(garbagedTerms.contains(t)) markTrash(t)
+                        else t + " "
+                        }) @snippet.post</p></li>
+                    <li class="list-group-item">@doc.id</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-@(Math.sqrt(categories.size).toInt+2)"><center>
+            @categories.map { category =>
+                @if(Dashboard.isCategoryDisabled(user, category, seedId)){
+                    @views.html.dashboard.item(embryon.seed,embryon,category,termsNClass.getOrElse(category.id,0),true)
+                }else{
+                    @views.html.dashboard.item(embryon.seed,embryon,category,termsNClass.getOrElse(category.id,0),false)
+                }
+            }                         </center>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading"><h4 class="panel-title">Last 100 garbaged words</h4></div>
+                <ul class="list-group"><li class="list-group-item"><p>@lastGarbagedTerms.map(t => {
+                    markTrash(t)
+                    })</p></li></ul>
+            </div>
+        </div>
+    </div>
+
+}

@@ -1,0 +1,30 @@
+@(user: User)
+
+@if(user != null) {
+    <ul class="nav navbar-nav navbar-right">
+        <li data-toggle="modal" data-target="#taskDescription"><a href="#"><i class="glyphicon glyphicon-question-sign"></i></a></li>
+        <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> @user.email <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+                <li><a href="@routes.Application.logout"><i class="fa fa-power-off"></i> @Messages("logout")</a></li>
+            </ul>
+        </li>
+    </ul>
+
+    <div class="modal fade" id="taskDescription" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h2 class="modal-title" id="myModalLabel">Need help?</h2>
+                </div>
+                <div class="modal-body">
+                    @description()
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

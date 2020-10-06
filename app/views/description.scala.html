@@ -1,0 +1,41 @@
+<h2>Description of the task</h2>
+<p>The task consists of annotating a given word in the context in which it plays. So remember to:</p>
+<blockquote style="border-color: #32FC00;"><p>Annotate the word within the context in which it plays!</p></blockquote>
+<p>If the selected word is part of a multiword entity, the word has to be annotated with the class you would associate to the whole entity.
+   For example if the selected word is <span class="label label-primary">Mean</span> and the snippet shows "[...] <span class="label label-primary">Mean</span> Avarage Precision [...]", the class to choose is Measure. So remember that:</p>
+<blockquote style="border-color: #32FC00;"><p>A word within a multiword entity is the multiword entity!</p></blockquote>
+<p>If a word within the context referes to something, for example, using a pronoun or calling it with the class to which it belongs, the class to choose is None or Garbage.
+   For example: if the selected word is <span class="label label-primary">metric</span> and the snippet shows "[...] the last <span class="label label-primary">metric</span> shown [...]", the class to choose is None;
+                If the selected word is <span class="label label-primary">it</span> and the snippet shows "[...] the last score is wonderful, <span class="label label-primary">it</span> comes from a miracle [...]", the class to choose is Garbage. So remember that:</p>
+<blockquote style="border-color: #FF666E;"><p>Anaphoras are banned!</p></blockquote>
+
+<h2>Description of the dashboard</h2>
+After you log in, the application will present a dashboard like in figure.
+Here you'll find two panels and a grid of buttons. In the first panel is shown the selected word and a snippet in which the word appears.
+<img class="img-responsive" style="margin:-70px -10px -140px -10px" src="/assets/images/system.png"></img>
+In the second panel you'll find the list of the last "garbaged" words made by you, where a click on a red marked word removes the word from the garbaged list.
+And, on the right, a grid of buttons to annotate and control the application.</p>
+<p>The buttons to control the application:
+<dl class="dl-horizontal">
+    <dt>Skip</dt>
+    <dd>Jump to the next!</dd>
+    <dt>None</dt>
+    <dd>Use it when none of the classes hold.</dd>
+    <dt>Garbage</dt>
+    <dd>When none of the classes hold now and will never ever hold in other contexts too!</dd>
+</dl></p>
+<p>And the buttons to apply the labels:
+<dl class="dl-horizontal">
+    <dt>Challenge</dt>
+    <dd>AdHoc track, Robust track, Web track, Math track, ...</dd>
+    <dt>Task</dt>
+    <dd>sometimes a Challenge has multiple tasks</dd>
+    <dt>Measure</dt>
+    <dd>MAP, PREF, Precision, Recall, ...</dd>
+    <dt>TestCollection</dt>
+    <dd>TIPSTER, .GOV, TREC-8, ...</dd>
+    <dt>Collection</dt>
+    <dd>is like a TestCollection but without Topics and Groundtruth/QRels</dd>
+    <dt>Run</dt>
+    <dd>is the name of the Run</dd>
+</dl></p>

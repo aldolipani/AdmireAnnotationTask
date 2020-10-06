@@ -1,0 +1,21 @@
+@(name: String)
+
+@main(null) {
+
+<script>
+    var name = "@name";
+    function updateProgressBar(){
+      $.getJSON("/exporter/status/"+name, function( data ) {
+        var bar = $('.progress-bar');
+            bar.width(data);
+      });
+    }
+    setInterval(updateProgressBar, 500);
+</script>
+<div class="progress">
+    <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100">
+        <span class="sr-only">% Complete</span>
+    </div>
+</div>
+
+}

@@ -1,0 +1,36 @@
+@(signupForm: Form[(String, String)])
+
+@import helper._
+    @implicitFieldConstructor = @{
+        FieldConstructor(twitterBootstrapInput.render)
+    }
+
+<h3>@Messages("signup.new")</h3>
+
+@form(controllers.account.routes.Signup.save()) {
+    @if(signupForm.hasGlobalErrors) {
+        @signupForm.globalError.map { error =>
+        <p class="error"><span class="label label-danger">
+            @error.message
+        </span></p>
+        }
+    }
+
+    <fieldset>
+        @inputText(
+            signupForm("username"),
+            'placeholder -> Messages("username"),
+            '_label -> null,
+            'class -> "form-control")
+        @inputPassword(
+            signupForm("password"),
+            '_label -> null,
+            'placeholder -> Messages("password"),
+            'class -> "form-control")
+    </fieldset>
+
+    <div class="form-actions">
+        <input type="submit" class="btn btn-primary" value="@Messages("signup.signup")">
+    </div>
+}
+

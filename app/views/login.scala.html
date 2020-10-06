@@ -1,0 +1,37 @@
+@(loginForm: Form[(String, String)])
+
+
+@import helper._
+@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapInput.render) }
+
+<h3>@Messages("signin.signin")</h3>
+
+@form(routes.Application.authenticate(), 'class -> "form") {
+
+    @if(loginForm.hasGlobalErrors) {
+        @loginForm.globalError.map { error =>
+            <p class="error"><span class="label label-danger">
+                @error.message
+            </span></p>
+        }
+    }
+
+    <fieldset>
+        @inputText(
+            loginForm("username"),
+            'placeholder -> Messages("username"),
+            '_label -> null,
+            '_help -> Messages("signin.your.username"),
+            'class -> "form-control")
+        @inputPassword(
+            loginForm("password"),
+            '_label -> null,
+            'placeholder -> Messages("password"),
+            '_help -> Messages("signin.your.password"),
+            'class -> "form-control")
+    </fieldset>
+
+    <div class="form-actions">
+        <input type="submit" class="btn btn-primary" value="@Messages("signin.signin")">
+    </div>
+}
